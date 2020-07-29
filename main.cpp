@@ -142,24 +142,43 @@ Uzytkownik pobierzDaneUzytkownika(string daneUzytkownikaOddzielonePionowymiKresk
 }
 
 
-int wczytajAdresatowZPliku(vector<Adresat> &adresaci,int log) {
+void wczytajAdresatowZPliku(vector<Adresat> &adresaci,int log) {
     Adresat adresat;
     string daneJednegoAdresataOddzielonePionowymiKreskami = "";
-    int IdOstatniegoAdresata;
     fstream plikTekstowy;
     plikTekstowy.open(nazwaPliku.c_str(), ios::in);
 
     if (plikTekstowy.good() == true) {
         while (getline(plikTekstowy, daneJednegoAdresataOddzielonePionowymiKreskami)) {
             adresat = pobierzDaneAdresata(daneJednegoAdresataOddzielonePionowymiKreskami);
-            IdOstatniegoAdresata=adresat.id;
+
             if(log==adresat.Id){
             adresaci.push_back(adresat);}
 
         }
         plikTekstowy.close();
     }
-    return IdOstatniegoAdresata;
+
+}
+int wczytajAdresatowZPlikuOstatniAdresat(vector<Adresat> &adresaci)
+{
+    Adresat adresat;
+    string daneJednegoAdresataOddzielonePionowymiKreskami = "";
+    int IdOstatniegoAdresata=0;
+    fstream plikTekstowy;
+    plikTekstowy.open(nazwaPliku.c_str(), ios::in);
+
+    if (plikTekstowy.good() == true)
+    {
+        while (getline(plikTekstowy, daneJednegoAdresataOddzielonePionowymiKreskami))
+        {
+            adresat = pobierzDaneAdresata(daneJednegoAdresataOddzielonePionowymiKreskami);
+            IdOstatniegoAdresata=adresat.id;
+
+        }
+        plikTekstowy.close();
+    }
+     return IdOstatniegoAdresata;
 }
 void wczytajUzytkownikowZPliku(vector<Uzytkownik> &uzytkownicy) {
     Uzytkownik uzytkownik;
@@ -363,12 +382,14 @@ void dodajAdresata(vector<Adresat> &adresaci, int log, int IdOstatniegoAdresata)
 
     system("cls");
     cout << ">>> DODAWANIE NOWEGO ADRESATA <<<" << endl << endl;
-
-    if (adresaci.empty() == true) {
+    fstream plik;
+    plik.open("Adresaci.txt", ios::in);
+    if (plik.good()==false) {
         adresat.id = 1;
     } else {
         adresat.id = IdOstatniegoAdresata + 1;
     }
+    plik.close();
     adresat.Id=log;
 
 
@@ -680,7 +701,7 @@ int main() {
         case '2':
             wczytajUzytkownikowZPliku(uzytkownicy);
             log=logowanie(uzytkownicy);
-            IdOstatniegoAdresata=wczytajAdresatowZPliku(adresaci,log);
+            wczytajAdresatowZPliku(adresaci,log);
             break;
         case '3':
             zakonczProgram();
@@ -708,6 +729,7 @@ int main() {
         switch(wybor)
         {
         case '1':
+            IdOstatniegoAdresata=wczytajAdresatowZPlikuOstatniAdresat(adresaci);
             dodajAdresata(adresaci,log,IdOstatniegoAdresata);
             break;
         case '2':
