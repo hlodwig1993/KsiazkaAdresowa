@@ -661,7 +661,9 @@ int logowanie(vector<Uzytkownik> &uzytkownicy)
                     int numer;
                     numer=itr->Id;
                     return numer;
-                }else{cout<<"Nie poprawne haslo!! Sprobuj jeszcze raz."<<endl;}
+                }else{cout<<"Nie poprawne haslo!! "<<endl;
+                system("pause");
+                return 0;}
 
             }
 
