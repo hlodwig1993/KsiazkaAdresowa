@@ -152,33 +152,31 @@ void wczytajAdresatowZPliku(vector<Adresat> &adresaci,int log) {
         while (getline(plikTekstowy, daneJednegoAdresataOddzielonePionowymiKreskami)) {
             adresat = pobierzDaneAdresata(daneJednegoAdresataOddzielonePionowymiKreskami);
 
-            if(log==adresat.Id){
-            adresaci.push_back(adresat);}
+            if(log==adresat.Id) {
+                adresaci.push_back(adresat);
+            }
 
         }
         plikTekstowy.close();
     }
 
 }
-int wczytajAdresatowZPlikuOstatniAdresat(vector<Adresat> &adresaci)
-{
+int wczytajAdresatowZPlikuOstatniAdresat(vector<Adresat> &adresaci) {
     Adresat adresat;
     string daneJednegoAdresataOddzielonePionowymiKreskami = "";
     int IdOstatniegoAdresata=0;
     fstream plikTekstowy;
     plikTekstowy.open(nazwaPliku.c_str(), ios::in);
 
-    if (plikTekstowy.good() == true)
-    {
-        while (getline(plikTekstowy, daneJednegoAdresataOddzielonePionowymiKreskami))
-        {
+    if (plikTekstowy.good() == true) {
+        while (getline(plikTekstowy, daneJednegoAdresataOddzielonePionowymiKreskami)) {
             adresat = pobierzDaneAdresata(daneJednegoAdresataOddzielonePionowymiKreskami);
             IdOstatniegoAdresata=adresat.id;
 
         }
         plikTekstowy.close();
     }
-     return IdOstatniegoAdresata;
+    return IdOstatniegoAdresata;
 }
 void wczytajUzytkownikowZPliku(vector<Uzytkownik> &uzytkownicy) {
     Uzytkownik uzytkownik;
@@ -299,6 +297,25 @@ void zapiszWszystkichUzytkownikowDoPlikuTekstowego(vector<Uzytkownik> &uzytkowni
         cout << "Nie mozna otworzyc pliku Uzytkownicy.txt" << endl;
     }
 }
+void zapiszWszystkichUzytkownikowDoPlikuTekstowegoZmianaHasla(vector<Uzytkownik> &uzytkownicy) {
+    fstream plikTekstowy;
+    string liniaZDanymiUzytkownika = "";
+
+    plikTekstowy.open(nazwaPliku1.c_str(), ios::out);
+    if (plikTekstowy.good()) {
+        for (vector<Uzytkownik>::iterator itr = uzytkownicy.begin(); itr != uzytkownicy.end(); itr++) {
+            liniaZDanymiUzytkownika += konwerjsaIntNaString(itr->Id) + '|';
+            liniaZDanymiUzytkownika += itr->login + '|';
+            liniaZDanymiUzytkownika += itr->haslo + '|';
+
+            plikTekstowy << liniaZDanymiUzytkownika<< endl;
+            liniaZDanymiUzytkownika = "";
+        }
+        plikTekstowy.close();
+    } else {
+        cout << "Nie mozna otworzyc pliku Uzytkownicy.txt" << endl;
+    }
+}
 
 void wyszukajAdresatowPoImieniu(vector<Adresat> &adresaci) {
     string imiePoszukiwanegoAdresata = "";
@@ -383,7 +400,7 @@ void dodajAdresata(vector<Adresat> &adresaci, int log, int IdOstatniegoAdresata)
     system("cls");
     cout << ">>> DODAWANIE NOWEGO ADRESATA <<<" << endl << endl;
     fstream plik;
-    plik.open("Adresaci.txt", ios::in);
+    plik.open(nazwaPliku.c_str(), ios::in);
     if (plik.good()==false) {
         adresat.id = 1;
     } else {
@@ -414,36 +431,34 @@ void dodajAdresata(vector<Adresat> &adresaci, int log, int IdOstatniegoAdresata)
 
     dopiszAdresataDoPliku(adresat);
 }
-void zapisDoPlikuUsunLogin(int nrLogin)
-    {
+void zapisDoPlikuUsunLogin(int nrLogin) {
     fstream plik;
     fstream plikTekstowy ;
     plikTekstowy.open("AdresaciTymczasowi.txt", ios::out);
-    plik.open("Adresaci.txt", ios::in);
+    plik.open(nazwaPliku.c_str(), ios::in);
     string linia="";
 
-    do
-    {   string idLogin="";
+    do {
+        string idLogin="";
         getline(plik, linia);
-        for(int nrZnaku=0;nrZnaku<linia.size();nrZnaku++)
-        {
-            if(linia[nrZnaku]!='|')
-            {
+        for(int nrZnaku=0; nrZnaku<linia.size(); nrZnaku++) {
+            if(linia[nrZnaku]!='|') {
                 idLogin+=linia[nrZnaku];
-            }else{break;}
+            } else {
+                break;
+            }
         }
         int idLogin1=atoi(idLogin.c_str());
-         if(idLogin1!=nrLogin){
+        if((idLogin1!=nrLogin)&&(linia!="")) {
             plikTekstowy << linia<<endl;
 
-         }
-    }
-    while(linia != "");
+        }
+    } while(linia != "");
     plik.close();
     plikTekstowy.close();
-    remove( "Adresaci.txt" );
-    rename("AdresaciTymczasowi.txt","Adresaci.txt");
-    }
+    remove( nazwaPliku.c_str() );
+    rename("AdresaciTymczasowi.txt",nazwaPliku.c_str());
+}
 void usunAdresata(vector<Adresat> &adresaci) {
     int idUsuwanegoAdresata = 0;
     char znak;
@@ -480,44 +495,43 @@ void usunAdresata(vector<Adresat> &adresaci) {
 
     system("pause");
 }
-void zapisDoPlikuEdycjaLogin(int nrLogin,vector<Adresat> &adresaci)
-    {Adresat adresat;
+void zapisDoPlikuEdycjaLogin(int nrLogin,vector<Adresat> &adresaci) {
+    Adresat adresat;
     fstream plik;
     fstream plikTekstowy ;
     plikTekstowy.open("AdresaciTymczasowi.txt", ios::out);
     plik.open("Adresaci.txt", ios::in);
     string linia="";
-    do
-    {   string idLogin="";
+    do {
+        string idLogin="";
         getline(plik, linia);
-        for(int nrZnaku=0;nrZnaku<linia.size();nrZnaku++)
-        {
-            if(linia[nrZnaku]!='|')
-            {
+        for(int nrZnaku=0; nrZnaku<linia.size(); nrZnaku++) {
+            if(linia[nrZnaku]!='|') {
                 idLogin+=linia[nrZnaku];
-            }else{break;}
+            } else {
+                break;
+            }
         }
         int idLogin1=atoi(idLogin.c_str());
-         if(idLogin1!=(nrLogin)){
-        plikTekstowy << linia<<endl;
-         }else{
-             linia=konwerjsaIntNaString(adresaci[nrLogin-1].id) + '|';
-             linia+=konwerjsaIntNaString(adresaci[nrLogin-1].Id) + '|';
-             linia+=adresaci[nrLogin-1].imie + '|';
-             linia+=adresaci[nrLogin-1].nazwisko + '|';
-             linia+=adresaci[nrLogin-1].numerTelefonu + '|';
-             linia+=adresaci[nrLogin-1].email + '|';
-             linia+=adresaci[nrLogin-1].adres + '|';
-             plikTekstowy<<linia<<endl;
+        if(idLogin1!=(nrLogin)) {
+            plikTekstowy << linia<<endl;
+        } else {
+            linia=konwerjsaIntNaString(adresaci[nrLogin-1].id) + '|';
+            linia+=konwerjsaIntNaString(adresaci[nrLogin-1].Id) + '|';
+            linia+=adresaci[nrLogin-1].imie + '|';
+            linia+=adresaci[nrLogin-1].nazwisko + '|';
+            linia+=adresaci[nrLogin-1].numerTelefonu + '|';
+            linia+=adresaci[nrLogin-1].email + '|';
+            linia+=adresaci[nrLogin-1].adres + '|';
+            plikTekstowy<<linia<<endl;
 
-         }
-    }
-    while(linia != "");
+        }
+    } while(linia != "");
     plik.close();
     plikTekstowy.close();
     remove( "Adresaci.txt" );
     rename("AdresaciTymczasowi.txt","Adresaci.txt");
-    }
+}
 void edytujAdresata(vector<Adresat> &adresaci) {
     int idWybranegoAdresata = 0;
     char wybor;
@@ -549,7 +563,7 @@ void edytujAdresata(vector<Adresat> &adresaci) {
                     itr->imie = wczytajLinie();
                     itr->imie = zamienPierwszaLitereNaDuzaAPozostaleNaMale(itr->imie);
                     cout << endl << "Imie zostalo zmienione" << endl << endl;
-                    zapisDoPlikuEdycjaLogin(idWybranegoAdresata,adresaci);
+                    zapiszWszystkichAdresatowDoPlikuTekstowego(adresaci);
                     break;
                 case '2':
                     cout << "Podaj nowe nazwisko: ";
@@ -619,7 +633,7 @@ void rejestracja(vector<Uzytkownik> &uzytkownicy) {
     if(wektorDlugosc!=0) {
         for (vector<Uzytkownik>::iterator itr = uzytkownicy.begin(); itr != uzytkownicy.end(); itr++) {
             if (itr->login == login) {
-                    czyIstniejeUzytkownik=true;
+                czyIstniejeUzytkownik=true;
 
                 cout<<"Taki login juz istnieje!!!";
                 system("pause");
@@ -627,13 +641,13 @@ void rejestracja(vector<Uzytkownik> &uzytkownicy) {
 
             }
 
-        }if((czyIstniejeUzytkownik==false)&&(wektorDlugosc!=0)){
-        uzytkownicy.push_back(uzytkownik);
-        dopiszUzytkownikowDoPliku(uzytkownik);
+        }
+        if((czyIstniejeUzytkownik==false)&&(wektorDlugosc!=0)) {
+            uzytkownicy.push_back(uzytkownik);
+            dopiszUzytkownikowDoPliku(uzytkownik);
 
-    }
-    }
-    else {
+        }
+    } else {
         uzytkownicy.push_back(uzytkownik);
         dopiszUzytkownikowDoPliku(uzytkownik);
 
@@ -641,43 +655,67 @@ void rejestracja(vector<Uzytkownik> &uzytkownicy) {
 
 }
 
-int logowanie(vector<Uzytkownik> &uzytkownicy)
-{
+int logowanie(vector<Uzytkownik> &uzytkownicy) {
     bool czyIstniejeUzytkownik = false;
-    if(!uzytkownicy.empty()){
-    cout<<"Podaj login: ";
-    string login;
-    login=wczytajLinie();
-    for (vector<Uzytkownik>::iterator itr = uzytkownicy.begin(); itr != uzytkownicy.end(); itr++) {
+    if(!uzytkownicy.empty()) {
+        cout<<"Podaj login: ";
+        string login;
+        login=wczytajLinie();
+        for (vector<Uzytkownik>::iterator itr = uzytkownicy.begin(); itr != uzytkownicy.end(); itr++) {
             if (itr->login == login) {
-                    czyIstniejeUzytkownik=true;
+                czyIstniejeUzytkownik=true;
 
                 cout<<"Podaj haslo :";
                 string haslo;
                 haslo=wczytajLinie();
-                if(itr->haslo==haslo){
+                if(itr->haslo==haslo) {
                     cout<<"Logowanie powiodlo sie."<<endl;
                     system("pause");
                     int numer;
                     numer=itr->Id;
                     return numer;
-                }else{cout<<"Nie poprawne haslo!! "<<endl;
-                system("pause");
-                return 0;}
+                } else {
+                    cout<<"Nie poprawne haslo!! "<<endl;
+                    system("pause");
+                    return 0;
+                }
 
             }
 
 
-            }
-            if(czyIstniejeUzytkownik==false){
-                cout<<"Nie ma takiego loginu w bazie danych"<<endl;
-                system("pause");
-                return 0;
-            }
+        }
+        if(czyIstniejeUzytkownik==false) {
+            cout<<"Nie ma takiego loginu w bazie danych"<<endl;
+            system("pause");
+            return 0;
+        }
 
-}}
+    }
+}
+void zmianaHasla(int log,vector<Uzytkownik> &uzytkownicy) {
+    Uzytkownik uzytkownik;
+
+    for (vector<Uzytkownik>::iterator itr = uzytkownicy.begin(); itr != uzytkownicy.end(); itr++) {
+        if (itr->Id == log) {
+
+            cout << "Podaj nowe haslo: ";
+            itr->haslo = wczytajLinie();
+            cout << endl << "Haslo zostalo zmienione" << endl << endl;
+            system("pause");
 
 
+            zapiszWszystkichUzytkownikowDoPlikuTekstowego(uzytkownicy);
+            break;
+
+        }
+    }
+}
+
+void jakdlugi(vector<Uzytkownik> &uzytkownicy){
+
+int wymiar=uzytkownicy.size();
+            cout<<wymiar;
+            system("pause");}
 int main() {
     vector<Adresat> adresaci;
     vector<Uzytkownik> uzytkownicy;
@@ -685,7 +723,6 @@ int main() {
     char wybor;
     int log=0;
     wczytajUzytkownikowZPliku(uzytkownicy);
-    //wczytajAdresatowZPliku(adresaci);
     while(log==0) {
         system("cls");
         cout<< ">>>Ksiazka Adresowa<<<"<<endl<<endl;
@@ -701,7 +738,6 @@ int main() {
 
             break;
         case '2':
-            wczytajUzytkownikowZPliku(uzytkownicy);
             log=logowanie(uzytkownicy);
             wczytajAdresatowZPliku(adresaci,log);
             break;
@@ -711,8 +747,7 @@ int main() {
 
 
     }
-    while (log!=0)
-    {
+    while (log!=0) {
         system("cls");
 
         cout << ">>> KSIAZKA ADRESOWA <<<" << endl << endl;
@@ -728,8 +763,7 @@ int main() {
         cout << "Twoj wybor: ";
         wybor = wczytajZnak();
 
-        switch(wybor)
-        {
+        switch(wybor) {
         case '1':
             IdOstatniegoAdresata=wczytajAdresatowZPlikuOstatniAdresat(adresaci);
             dodajAdresata(adresaci,log,IdOstatniegoAdresata);
@@ -750,7 +784,7 @@ int main() {
             edytujAdresata(adresaci);
             break;
         case '7':
-            edytujAdresata(adresaci);
+            zmianaHasla(log,uzytkownicy);
             break;
         case '8':
             cout<<"Zostales wylogowany"<<endl;
