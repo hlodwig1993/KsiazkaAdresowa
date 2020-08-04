@@ -513,7 +513,8 @@ void zapisDoPlikuEdycjaLogin(int nrLogin,vector<Adresat> &adresaci) {
             }
         }
         int idLogin1=atoi(idLogin.c_str());
-        if(idLogin1!=(nrLogin)) {
+
+        if(idLogin1!=nrLogin) {
             plikTekstowy << linia<<endl;
         } else {
             linia=konwerjsaIntNaString(adresaci[nrLogin-1].id) + '|';
@@ -531,6 +532,51 @@ void zapisDoPlikuEdycjaLogin(int nrLogin,vector<Adresat> &adresaci) {
     plikTekstowy.close();
     remove( "Adresaci.txt" );
     rename("AdresaciTymczasowi.txt","Adresaci.txt");
+}
+void zapisDoPlikuEdycjaAdresata(vector<Adresat> &adresaci) {
+    Adresat adresat;
+    int licznik=0;
+    fstream plik;
+    fstream plikTekstowy ;
+    plikTekstowy.open("AdresaciTymczasowi.txt", ios::out);
+    plik.open(nazwaPliku.c_str(), ios::in);
+    string linia="";
+    do {
+        string idLogin="";
+        getline(plik, linia);
+        for(int nrZnaku=0; nrZnaku<linia.size(); nrZnaku++) {
+            if(linia[nrZnaku]!='|') {
+                idLogin+=linia[nrZnaku];
+            } else {
+                break;
+            }
+        }
+        int idLogin1=atoi(idLogin.c_str());
+        if((linia=="")) {
+                break;
+        }
+        else if(idLogin1!=adresaci[licznik].id){
+            plikTekstowy<<linia<<endl;
+        }
+
+         else {
+            linia=konwerjsaIntNaString(adresaci[licznik].id) + '|';
+            linia+=konwerjsaIntNaString(adresaci[licznik].Id) + '|';
+            linia+=adresaci[licznik].imie + '|';
+            linia+=adresaci[licznik].nazwisko + '|';
+            linia+=adresaci[licznik].numerTelefonu + '|';
+            linia+=adresaci[licznik].email + '|';
+            linia+=adresaci[licznik].adres + '|';
+            plikTekstowy<<linia<<endl;
+            licznik++;
+
+
+        }
+    } while(linia != "");
+    plik.close();
+    plikTekstowy.close();
+    remove( nazwaPliku.c_str());
+    rename("AdresaciTymczasowi.txt",nazwaPliku.c_str());
 }
 void edytujAdresata(vector<Adresat> &adresaci) {
     int idWybranegoAdresata = 0;
@@ -563,32 +609,32 @@ void edytujAdresata(vector<Adresat> &adresaci) {
                     itr->imie = wczytajLinie();
                     itr->imie = zamienPierwszaLitereNaDuzaAPozostaleNaMale(itr->imie);
                     cout << endl << "Imie zostalo zmienione" << endl << endl;
-                    zapiszWszystkichAdresatowDoPlikuTekstowego(adresaci);
+                    zapisDoPlikuEdycjaAdresata(adresaci);
                     break;
                 case '2':
                     cout << "Podaj nowe nazwisko: ";
                     itr->nazwisko = wczytajLinie();
                     itr->nazwisko = zamienPierwszaLitereNaDuzaAPozostaleNaMale(itr->nazwisko);
                     cout << endl << "Nazwisko zostalo zmienione" << endl << endl;
-                    zapiszWszystkichAdresatowDoPlikuTekstowego(adresaci);
+                    zapisDoPlikuEdycjaAdresata(adresaci);
                     break;
                 case '3':
                     cout << "Podaj nowy numer telefonu: ";
                     itr->numerTelefonu = wczytajLinie();
                     cout << endl << "Numer telefonu zostal zmieniony" << endl << endl;
-                    zapiszWszystkichAdresatowDoPlikuTekstowego(adresaci);
+                    zapisDoPlikuEdycjaAdresata(adresaci);
                     break;
                 case '4':
                     cout << "Podaj nowy email: ";
                     itr->email = wczytajLinie();
                     cout << endl << "Email zostal zmieniony" << endl << endl;
-                    zapiszWszystkichAdresatowDoPlikuTekstowego(adresaci);
+                    zapisDoPlikuEdycjaAdresata(adresaci);
                     break;
                 case '5':
                     cout << "Podaj nowy adres zamieszkania: ";
                     itr->adres = wczytajLinie();
                     cout << endl << "Adres zostal zmieniony" << endl << endl;
-                    zapiszWszystkichAdresatowDoPlikuTekstowego(adresaci);
+                    zapisDoPlikuEdycjaAdresata(adresaci);
                     break;
                 case '6':
                     cout << endl << "Powrot do menu glownego" << endl << endl;
@@ -690,7 +736,9 @@ int logowanie(vector<Uzytkownik> &uzytkownicy) {
             return 0;
         }
 
-    }
+    }else{cout<<"Prosimy sie zarejstrowac!!"<<endl;
+    system("pause");
+    return 0;}
 }
 void zmianaHasla(int log,vector<Uzytkownik> &uzytkownicy) {
     Uzytkownik uzytkownik;
@@ -711,11 +759,6 @@ void zmianaHasla(int log,vector<Uzytkownik> &uzytkownicy) {
     }
 }
 
-void jakdlugi(vector<Uzytkownik> &uzytkownicy){
-
-int wymiar=uzytkownicy.size();
-            cout<<wymiar;
-            system("pause");}
 int main() {
     vector<Adresat> adresaci;
     vector<Uzytkownik> uzytkownicy;
@@ -739,7 +782,7 @@ int main() {
             break;
         case '2':
             log=logowanie(uzytkownicy);
-            wczytajAdresatowZPliku(adresaci,log);
+             wczytajAdresatowZPliku(adresaci,log);
             break;
         case '3':
             zakonczProgram();
@@ -749,7 +792,6 @@ int main() {
     }
     while (log!=0) {
         system("cls");
-
         cout << ">>> KSIAZKA ADRESOWA <<<" << endl << endl;
         cout << "1. Dodaj adresata" << endl;
         cout << "2. Wyszukaj po imieniu" << endl;
